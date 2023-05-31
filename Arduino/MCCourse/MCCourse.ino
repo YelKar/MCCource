@@ -1,6 +1,6 @@
+#include "Arduino.h"
 #include "machine.h"
 #include "PS2X_lib.h"
-
 // motor
 #define fd 6
 #define bd 7
@@ -43,7 +43,5 @@ void loop() {
         Serial.println(out);
     }
     delay(10);
-//    if (x = Serial.parseInt()) a = x;
-//    Serial.println(a);
-  Serial.println(a);
+    Serial.println(a);
 }
