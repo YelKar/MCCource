@@ -2,8 +2,14 @@
 #include "machine.h"
 #include "PS2X_lib.h"
 // motor
-#define fd 6
-#define bd 7
+#define flf 5
+#define flb 6
+#define frf 7
+#define frb 8
+#define blf 9
+#define blb 10
+#define brf 11
+#define brb 12
 
 // ps2x
 #define ps2_data A3
@@ -15,8 +21,9 @@ PS2X ps2x;
 void setup() {
     Serial.begin(9600);
     Serial.setTimeout(10);
-    pinMode(fd, OUTPUT);
-    pinMode(bd, OUTPUT);
+    for (int i = 5; i <= 12; i++) {
+        pinMode(i, OUTPUT);
+    }
     int error = ps2x.config_gamepad(ps2_clk, ps2_cmd, ps2_atn, ps2_data, false, false);
     Serial.println(error);
     if(error == 0){
@@ -26,21 +33,34 @@ void setup() {
     // Serial.println("Go to www.billporter.info for updates and to report bugs.");
    }
 }
-char out[32];
 int a;
+
+// Колеса
+ctrl::Motor
+    FdLt(flf, flb),
+    FdRt(frf, frb),
+    BdLt(blf, blb),
+    BdRt(brf, brb);
+
+ctrl::Machine machine(&FdLt, &FdRt, &BdLt, &BdRt);
+
 
 void loop() {
     bool success = ps2x.read_gamepad(false, 0);
     ps2x.reconfig_gamepad();
 
     if (success) {
-        int r[] = {
-            ps2x.Analog(PSS_LX), ps2x.Analog(PSS_LY),
-            ps2x.Analog(PSS_RX), ps2x.Analog(PSS_RY),
-        };
-        a = map(r[1], 0, 255, -255, 255);
-        sprintf(out, "lx=%d\tly=%d\trx=%d\try=%d", r[0], r[1], r[2], r[3]);
-        Serial.println(out);
+        int lx = ps2x.Analog(PSS_LX),
+            ly = ps2x.Analog(PSS_LY),
+            rx = ps2x.Analog(PSS_RX),
+            ry = ps2x.Analog(PSS_RY);
+        int *r[] = {&lx, &ly, &rx, &ry};
+        for (int* m : r) {
+            *m = map(*m, 0, 255, -255, 255);
+        }
+        machine.rotate(lx);
+        machine.x(rx);
+        machine.y(ry);
     }
     delay(10);
     Serial.println(a);

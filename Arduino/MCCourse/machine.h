@@ -1,6 +1,7 @@
 namespace ctrl {
     class Motor;
     class Machine;
+    typedef Motor** Motors;
     void limit(int * x);
     int limit(int x);
 }
@@ -13,7 +14,7 @@ public:
         fd_pin = pwd_fd;
         bd_pin = dig_bd;
     }
-    void go(int speed) {
+    void go(int speed) const {
         limit(&speed);
         digitalWrite(bd_pin, speed < 0);
         analogWrite(fd_pin, speed % 256);
@@ -23,29 +24,43 @@ public:
 class ctrl::Machine {
 private:
     Motor *fl, *fr, *bl, *br;
-    Motor *all[4];
+    Motors all;
 public:
     Machine(Motor* _fl, Motor* _fr, Motor* _bl, Motor* _br) {
-        all[0] = fl = _fl;
-        all[1] = fr = _fr;
-        all[2] = bl = _bl;
-        all[3] = br = _br;
+        all = (Motor*[]){
+            fl = _fl,
+            fr = _fr,
+            bl = _bl,
+            br = _br
+        };
     }
-    void y(int speed) {
-        
+    void y(int speed) const {
+        Motors mtr = all;
+        for (int i = 0; i < 4; mtr++, i++) {
+            (*mtr)->go(speed);
+        }
     }
-    void x(int speed) {
-
+    void x(int speed) const {
+        fr->go(speed);
+        fl->go(speed);
+        br->go(-speed);
+        bl->go(-speed);
     }
-    void rotate(int speed) {
-
+    void rotate(int speed) const {
+        fr->go(-speed);
+        fl->go(speed);
+        br->go(-speed);
+        bl->go(speed);
     }
-    void stop() {
-        for (Motor * i : all) {
-            i->go(0);
+    void stop() const {
+        Motors mtr = all;
+        for (int i = 0; i < 4; mtr++, i++) {
+            (*mtr)->go(0);
         }
     }
 };
+
+
 
 void ctrl::limit(int * x) {
     if (abs(*x) >= 256) {
