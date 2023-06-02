@@ -15,10 +15,10 @@ def print_ctrl():
     last = copy(ctrl)
     while not stop.is_set():
         if last != ctrl:
-            print(ctrl, stop.is_set())
+            print(ctrl)
             last = copy(ctrl)
             # eel.log(ctrl.__repr__())
-        time.sleep(0.1)
+        time.sleep(0.01)
 
 
 t = Thread(target=print_ctrl)
@@ -32,7 +32,6 @@ eel.expose(ctrl.set)
 @eel.expose()
 def left(val: int):
     assert isinstance(val, (int, float))
-    print("left", val)
     ctrl.set(val)
 
 
