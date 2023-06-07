@@ -1,7 +1,7 @@
 import json
 from dataclasses import dataclass
 
-from singleton import Singleton
+from src.singleton import Singleton
 
 
 @dataclass
@@ -11,5 +11,5 @@ class Controller(Singleton):
     rightX: int = 0
     rightY: int = 0
 
-    def json(self):
+    def json(self) -> str:
         return json.dumps(self.__dict__)

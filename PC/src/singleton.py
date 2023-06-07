@@ -1,5 +1,9 @@
+from typing import Self
+
+
 class Singleton(object):
     id: int = 0
+    __it__: Self
 
     def __new__(cls, *args, **kwargs):
         cls.id += 1

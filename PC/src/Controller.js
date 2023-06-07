@@ -66,24 +66,38 @@ class Controller {
         this.activateListeners()
     }
     activateListeners() {
+        this.canvas.addEventListener("touchstart", () => this.mouse.isDown = true)
+        this.canvas.addEventListener("touchend", () => this.mouse.isDown = false)
+        this.canvas.addEventListener("touchmove", ev => {
+            let el = this.canvas.getBoundingClientRect();
+            ev.preventDefault()
+            this.mouse.x = ev.touches[0].clientX - el.x;
+            this.mouse.y = ev.touches[0].clientY - el.y;
+        })
         this.canvas.addEventListener("mousedown", ()=> this.mouse.isDown = true);
         this.canvas.addEventListener("mouseup", () => this.mouse.isDown = false);
         this.canvas.addEventListener("mousemove", ev => {
             this.mouse.x = ev.offsetX;
             this.mouse.y = ev.offsetY;
         })
+
         this.canvas.addEventListener("mouseenter", () => this.mouse.isInside = true);
         this.canvas.addEventListener("mouseleave", () => this.mouse.isInside = false);
         window.addEventListener("mouseup", () => this.mouse.isDown = false)
     }
     update() {
         if (this.mouse.isDown) {
-            this.moveTo(this.mouse.x, this.mouse.y, 2)
+            this.moveTo(this.mouse.x, this.mouse.y, 20)
         } else {
-            this.moveTo(this.stick.defX, this.stick.defY, 4);
+            this.moveTo(this.stick.defX, this.stick.defY, 20);
         }
+        this.updateSize();
+    }
+    updateSize() {
         this.stick.defX = this.canvas.width / 2;
         this.stick.defY = this.canvas.height / 2;
+
+        this.stick.radius = Math.min(this.canvas.width, this.canvas.height) / 3;
     }
     moveTo(x, y, div) {
         let deltaX = parseInt(this.stick.x - x);

@@ -1,41 +1,38 @@
-#include "ESP8266WiFi.h"
-
-//char* ssid = "Wifi";
-//char* pwd = "password";
+#include "WiFi.h"
 
 
-void setup() {
-    Serial.begin(9600);
-    Serial.println("Hello");
-    WiFi.begin("Wifi", "password");
+WiFiClient client;
+const IPAddress serverIP(192,168,1,7);
+uint16_t serverPort = 9999;
+
+void setupWifi(char * ssid, char * pwd) {
+    WiFi.begin(ssid, pwd);
     Serial.print("\n\n\nConnecting...");
-    
+
     while (WiFi.status() != WL_CONNECTED)
     {
         delay(500);
         Serial.print(".");
     }
-    Serial.println("\n\nConnected");
+    Serial.println("\n");
+    Serial.println("Connected!");
     Serial.print("IP Address:");
     Serial.println(WiFi.localIP());
 }
 
-
-WiFiClient client;
-const IPAddress serverIP(192,168,224,89);
-uint16_t serverPort = 9999;
-
-void loop() {
+String get() {
+    GET:
+    String line;
     if (client.connect(serverIP, serverPort)) //Try to access the target address
     {
         while (!(client.available() || client.connected()));
-        String line = client.readStringUntil('}');
-        Serial.println(line);
+        line = client.readStringUntil('/');
     }
     else
     {
         Serial.println("Access failed");
         client.stop(); //Close the client
+        goto GET;
     }
-    delay(100);
+    return line;
 }

@@ -102,17 +102,17 @@ let ctrlL = new Controller(canvasL)
 ctrlL.stick.radius = ctrlL.canvas.width / 2;
 let ctrlR = new Controller(canvasR)
 ctrlR.stick.radius = ctrlR.canvas.width / 2;
-ctrlL.onMove = () => {
-    eel.left(ctrlL.stick.x - ctrlL.canvas.width / 2);
-    // ctrlL.stick.y - ctrlL.canvas.height / 2
-    // console.log(0, ctrlL.stick.x - ctrlL.canvas.width / 2, ctrlL.stick.y - ctrlL.canvas.height / 2)
+
+function sendData() {
+    eel.send_data(
+         ctrlL.stick.x - ctrlL.canvas.width / 2,
+         ctrlL.canvas.height / 2 - ctrlL.stick.y,
+         ctrlR.stick.x - ctrlR.canvas.width / 2,
+         ctrlR.canvas.height / 2 - ctrlR.stick.y,
+    )
 }
-ctrlR.onMove = () => {
-    eel.right_x(ctrlR.stick.x - ctrlR.canvas.width / 2);
-    eel.right_y(ctrlR.stick.y - ctrlR.canvas.width / 2);
-    // ctrlL.stick.y - ctrlL.canvas.height / 2
-    // console.log(0, ctrlL.stick.x - ctrlL.canvas.width / 2, ctrlL.stick.y - ctrlL.canvas.height / 2)
-}
+ctrlL.onMove = ctrlR.onMove = sendData;
+
 !function play () {
     ctrlL.draw()
     ctrlR.draw()
