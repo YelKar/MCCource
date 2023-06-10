@@ -2,6 +2,9 @@ from typing import Self
 
 
 class Singleton(object):
+    """
+    Метакласс-Синглтон для класса src.controller.Controller
+    """
     id: int = 0
     __it__: Self
 

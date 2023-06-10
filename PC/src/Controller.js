@@ -1,5 +1,7 @@
 class Controller {
-    constructor(cvs) {
+    constructor(cvs, bgc="#aaa", stickColor="#666", stickDiv=4) {
+        this.stickDiv = stickDiv;
+
         this.canvas = cvs;
         this.ctx = this.canvas.getContext("2d");
 
@@ -87,19 +89,26 @@ class Controller {
     }
     update() {
         if (this.mouse.isDown) {
-            this.moveTo(this.mouse.x, this.mouse.y, 20)
+            this.moveTo(this.mouse.x, this.mouse.y, this.stickDiv)
         } else {
-            this.moveTo(this.stick.defX, this.stick.defY, 20);
+            this.moveTo(this.stick.defX, this.stick.defY, this.stickDiv);
         }
         this.updateSize();
     }
     updateSize() {
+        /*
+        При изменении размеров окна,
+        функция подстраивает размеры элементов под новые размеры окна
+         */
         this.stick.defX = this.canvas.width / 2;
         this.stick.defY = this.canvas.height / 2;
 
         this.stick.radius = Math.min(this.canvas.width, this.canvas.height) / 3;
     }
     moveTo(x, y, div) {
+        /*
+        Двигает стик ближе к указанному месту
+         */
         let deltaX = parseInt(this.stick.x - x);
         let deltaY = parseInt(this.stick.y - y);
         if (deltaX != 0) {
@@ -114,15 +123,14 @@ class Controller {
         this.stick.y = this.stick.defY;
     }
     draw() {
-        if (this != undefined) {
-            this.ctx.beginPath();
-            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            this.ctx.fillStyle = "#ddd";
-            this.ctx.rect(0, 0, this.canvas.width, this.canvas.height);
-            this.ctx.fill()
-            this.ctx.closePath()
-            this.stick.draw()
-        }
+        this.ctx.beginPath();
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.fillStyle = "#ddd";
+        this.ctx.rect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.fill()
+        this.ctx.closePath()
+
+        this.stick.draw()
     }
     onMove() {
 

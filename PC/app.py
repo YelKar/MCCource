@@ -1,33 +1,23 @@
 import socketserver
-from threading import Thread, Event
+from threading import Thread
 
 import eel
 from loguru import logger
 
 from src.controller import Controller
 
-ctrl = Controller()
-
-stop = Event()
-
 logger.level("SENT DATA", no=20, color="<cyan><bold>")
 
-#
-# def print_ctrl():
-#     last = ctrl.json()
-#     while not stop.is_set():
-#         if last != ctrl.json():
-#             print(ctrl)
-#             last = ctrl.json()
-#             # eel.log(ctrl.__repr__())
-#         time.sleep(0.01)
-#
-#
-# t = Thread(target=print_ctrl)
-# t.start()
+ctrl = Controller()
 
 
 def main_server():
+    """Поток сервера
+    Сервер будет получать запросы от платформы
+    и отправлять JSON из экземпляра класса src.controller.Controller
+    :return:
+    """
+
     from src.server import handler
 
     def handle():
@@ -40,18 +30,31 @@ def main_server():
         server.serve_forever()
 
 
+logger.info("Start server thread")
 start_server = Thread(target=main_server)
 start_server.start()
 
+logger.info("Initializing application")
 eel.init(".")
 
-eel._expose("log", print)
+
+@eel.expose
+def log(*args, **kwargs):
+    print(*args, **kwargs)
+
 
 @eel.expose
 def send_data(*data):
+    """
+    Эта функция будет выполняться из Frontend'а,
+    с помощью JavaScript,
+    и будет получать данные и записывать из в экземпляр-синглтон src.controller.Controller
+    :param data:
+    :return:
+    """
     Controller(*data)
 
-try:
-    eel.start("main.html", port="5000")
-finally:
-    stop.set()
+
+logger.info(f"Set browser - {(browser := 'edge')}")
+logger.info("Launching application")
+eel.start("main.html", port="5000", mode=browser)

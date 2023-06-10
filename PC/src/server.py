@@ -15,5 +15,5 @@ def handler(handle: Callable[..., bytes]):
 if __name__ == "__main__":
     HOST, PORT = "0.0.0.0", 9999
 
-    with socketserver.TCPServer((HOST, PORT), handler(lambda: b"{dsfrdfhhssdfsdf}}")) as server:
+    with socketserver.TCPServer((HOST, PORT), handler(lambda: b"{a: 0}}")) as server:
         server.serve_forever()
