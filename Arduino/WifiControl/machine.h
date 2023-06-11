@@ -2,9 +2,9 @@ namespace ctrl {
     class Motor;
     class Machine;
     typedef Motor* Motors;
-    void limit(int * x);
-    int limit(int x);
-    int mod(int a, int b);
+    void limit(int * x);  // Функция ограничевает значение переданного указателя до 255
+    int limit(int x);  // Функция ограничевает значение переданной переменной до 255 и возвращает полученное значение
+    int mod(int a, int b);  // Функция для взятия остатка
 }
 
 class ctrl::Motor {
