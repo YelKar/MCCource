@@ -1,13 +1,19 @@
 #include "WiFi.h"
 
 
-WiFiClient client;
-const IPAddress serverIP(192,168,1,7);
-uint16_t serverPort = 9999;
+WiFiUDP Udp;
+char packetBuffer[255];
+
+const IPAddress serverIP(192,168,1,6);
+uint16_t serverPort = 1111;
+
+IPAddress clientIP(192, 168, 1, 20);
+IPAddress Subnet(255, 255, 255, 0);
 
 void setupWifi(char * ssid, char * pwd) {
     // Подключаемся к WiFi
     WiFi.begin(ssid, pwd);
+    WiFi.mode(WIFI_STA);
     Serial.print("\n\n\nConnecting...");
 
     // Ждём подкючения
@@ -16,6 +22,8 @@ void setupWifi(char * ssid, char * pwd) {
         delay(500);
         Serial.print(".");
     }
+    WiFi.config(clientIP, serverIP, Subnet);
+    Udp.begin(serverPort);
     Serial.println("\n");
     Serial.println("Connected!");
     Serial.print("IP Address:");
@@ -23,21 +31,17 @@ void setupWifi(char * ssid, char * pwd) {
 }
 
 String get() {
-    // While not Connected
-    GET:
-    String line;
-    if (client.connect(serverIP, serverPort))
-    {
-        while (!(client.available() || client.connected()));
-        // Когда получаем информацию, считываем её
-        line = client.readStringUntil('/');
-    }
-    else
-    {
-        // Если нет соединения, переходим в начало функции
-        Serial.println("Access failed");
-        client.stop();
-        goto GET;
-    }
-    return line;
+    int packageSize = 0;
+    Udp.beginPacket(serverIP, serverPort);
+    Udp.println("GET");
+    Udp.endPacket();
+    packageSize = Udp.parsePacket();
+    Udp.read(packetBuffer, packageSize);
+
+    String msg = packetBuffer;
+    msg.trim();
+
+    Serial.print("JSON: ");
+    Serial.println(msg);
+    return msg;
 }

@@ -1,4 +1,3 @@
-import socketserver
 from threading import Thread
 
 import eel
@@ -18,16 +17,13 @@ def main_server():
     :return:
     """
 
-    from src.server import handler
+    from src.UDPServer import start
 
     def handle():
-        logger.log("SENT DATA", "{json}", json=(json := f"{Controller.__it__.json()}/"))
-        return bytes(json, "ascii")
+        logger.log("SENT DATA", "{json}", json=(json := f"{Controller.__it__.json()}"))
+        return bytes(json + "\n", "ascii")
 
-    HOST, PORT = "0.0.0.0", 9999
-
-    with socketserver.TCPServer((HOST, PORT), handler(handle)) as server:
-        server.serve_forever()
+    start("0.0.0.0", 1111, handle)
 
 
 logger.info("Start server thread")

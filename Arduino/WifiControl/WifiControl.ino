@@ -10,24 +10,24 @@
 */
 
 // Левый передний
-#define flfd  0
+#define flfd  23
 #define flpwm 0
-#define flbd  4
+#define flbd  22
 
 // Левый задний
-#define blfd  16
+#define blfd  19
 #define blpwm 1
-#define blbd  17
+#define blbd  18
 
 // Правый задний
-#define frfd  13
+#define frfd  0
 #define frpwm 2
-#define frbd  12
+#define frbd  4
 
 // Правый передний
-#define brfd  14
+#define brfd  16
 #define brpwm 3
-#define brbd  27
+#define brbd  17
 
 
 #define pwmFreq 1000
@@ -60,6 +60,8 @@ void setup() {
     pinMode(LED_BUILTIN, OUTPUT);
 
     digitalWrite(LED_BUILTIN, LOW);
+    
+    Serial.println((String) ssid + " " + pwd);
     setupWifi(ssid, pwd);
 
     // При подключении к WiFi, включаем встроенный пин
@@ -79,11 +81,13 @@ int c = 0;
 String json;
 
 void loop() {
+    Serial.println("GET:");
     Serial.print(json = get());
     if (json) {
+        Serial.println("JSON:");
         DynamicJsonDocument doc(1024);
         deserializeJson(doc, json);
-        Serial.print(" ");
+        Serial.print("JSON deserialized\n\n");
         Serial.println(c++);
         int rx = doc["rightX"];
         int ry = doc["rightY"];
@@ -92,6 +96,6 @@ void loop() {
         m.x(rx);
         m.rotate(lx);
         m.update();
+        Serial.println("END\n\n\n");
     }
-    delay(50);
 }
