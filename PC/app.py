@@ -1,3 +1,4 @@
+import time
 from threading import Thread
 
 import eel
@@ -10,25 +11,46 @@ logger.level("SENT DATA", no=20, color="<cyan><bold>")
 ctrl = Controller()
 
 
-def main_server():
-    """Поток сервера
-    Сервер будет получать запросы от платформы
-    и отправлять JSON из экземпляра класса src.controller.Controller
-    :return:
-    """
+def client():
+    import socket
 
-    from src.UDPServer import start
+    UDP_IP = "192.168.1.20"
+    UDP_PORT = 9999
 
-    def handle():
-        logger.log("SENT DATA", "{json}", json=(json := f"{Controller.__it__.json()}"))
-        return bytes(json + "\n", "ascii")
-
-    start("0.0.0.0", 1111, handle)
+    sock = socket.socket(socket.AF_INET,  # Internet
+                         socket.SOCK_DGRAM)  # UDP
+    while True:
+        sock.sendto(MESSAGE := Controller.__it__.json().encode(), (UDP_IP, UDP_PORT))
+        logger.log("SENT DATA", MESSAGE.decode())
+        time.sleep(.25)
 
 
 logger.info("Start server thread")
-start_server = Thread(target=main_server)
+start_server = Thread(target=client)
 start_server.start()
+
+# @dataclass
+# class Keys:
+#     forward: str = 'w'
+#     backward: str = 's'
+#     right: str = 'a'
+#     left: str = 'f'
+#     r_right: str = 'e'
+#     r_left: str = 'q'
+#
+#
+# @keyboard.on_press
+# def kb_ctrl(key: keyboard.KeyboardEvent):
+#     match key.name:
+#         case Keys.forward:
+#             Controller.__it__.leftY = Controller.__it__.rightY = 255
+#             keyboard.wait(key.name, True, True)
+#             Controller.__it__.leftY = Controller.__it__.rightY = 0
+#         case Keys.backward:
+#             Controller.__it__.leftY = Controller.__it__.rightY = -255
+#             keyboard.wait(key.name, True, True)
+#             Controller.__it__.leftY = Controller.__it__.rightY = 0
+
 
 logger.info("Initializing application")
 eel.init(".")

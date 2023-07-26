@@ -1,6 +1,6 @@
 #include "ArduinoJson.h"
 #include "machine.h"
-#include "Client.h"
+#include "Server.h"
 
 /*
 Объявляем макросы для моторов
